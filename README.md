@@ -11,6 +11,7 @@ Este diagrama representa las tablas principales del modelo de datos:
 - **category** — etiquetas por categoría con relación M:N hacia **post**
 - **like** — likes únicos por usuario y post
 
+
 Próximos pasos sugeridos:
 Paso	Acción
 1	Editar README.md para incluir el diagrama como imagen
