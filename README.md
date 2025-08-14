@@ -1,19 +1,60 @@
+# 📝 Modelo de Datos del Blog
 
-### Diagrama del modelo de datos
+Este proyecto implementa el modelo de datos y estructura base para un blog usando **Flask**, **SQLAlchemy** y **Alembic** para la gestión de migraciones.
+
+---
+
+## 🚀 Tecnologías usadas
+- **Python 3**
+- **Flask** — Framework web
+- **Flask SQLAlchemy** — ORM
+- **Flask Migrate / Alembic** — Migraciones
+- **DrawDB** — Creación del diagrama ERD
+
+---
+
+## 📊 Diagrama de Entidad-Relación (ERD)
 
 ![ERD del Blog](diagram.png)
- GitHub renderizará automáticamente el diagrama dentro del README, lo que hace que la página principal se vea mucho más profesional. Además de esto, puedes incluir una breve explicación:
 
-Este diagrama representa las tablas principales del modelo de datos:
+**Tablas principales:**
 - **user** — autores registrados
-- **post** — posts escritos por usuarios
-- **comment** — comentarios relacionados a posts
-- **category** — etiquetas por categoría con relación M:N hacia **post**
+- **post** — publicaciones de usuarios
+- **comment** — comentarios a publicaciones
+- **category** — categorías con relación M:N a post
 - **like** — likes únicos por usuario y post
 
+---
 
-Próximos pasos sugeridos:
-Paso	Acción
-1	Editar README.md para incluir el diagrama como imagen
-2	Hacer git add README.md y git commit -m "Add ERD to README"
-3	Hacer git push y refrescar GitHub
+## ⚙️ Instalación
+
+```bash
+# 1. Clonar repositorio
+git clone https://github.com/alejandrabarcena/modelo-de-datos-blog.git
+cd modelo-de-datos-blog
+
+# 2. Crear entorno virtual
+pipenv install
+
+# 3. Activar entorno
+pipenv shell
+
+# 4. Configurar variables de entorno
+cp src/.env.example .env
+
+# 5. Inicializar base de datos
+flask db upgrade
+
+# 6. Ejecutar el servidor
+flask run
+
+📂 Estructura de carpetas
+modelo-de-datos-blog/
+│── migrations/         # Migraciones Alembic
+│── src/                # Código fuente
+│   ├── app.py           # App Flask
+│   ├── models.py        # Modelos SQLAlchemy
+│   ├── .env.example     # Variables de entorno
+│── diagram.png          # Diagrama ERD
+│── README.md
+
