@@ -1,0 +1,21 @@
+﻿# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+
+# Entornos
+.venv/
+venv/
+.env
+.env.*
+
+# Pipenv
+Pipfile.lock
+
+# DB local
+app.db
+
+# VS Code
+.vscode/
