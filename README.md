@@ -1,60 +1,38 @@
-# 📝 Modelo de Datos del Blog
+# StarWars Blog – Modelo de Datos
 
-Este proyecto implementa el modelo de datos y estructura base para un blog usando **Flask**, **SQLAlchemy** y **Alembic** para la gestión de migraciones.
+Modelo en **SQLAlchemy** + diagrama **ER** para usuarios, personajes, planetas y favoritos.
 
----
+## 🧱 Tech
+- Python 3.13, SQLAlchemy
+- ERAlchemy2 (genera `diagram.png`)
+- PostgreSQL (DDL en `schema.sql`)
+- ChartDB (diagrama online)
 
-## 🚀 Tecnologías usadas
-- **Python 3**
-- **Flask** — Framework web
-- **Flask SQLAlchemy** — ORM
-- **Flask Migrate / Alembic** — Migraciones
-- **DrawDB** — Creación del diagrama ERD
-
----
-
-## 📊 Diagrama de Entidad-Relación (ERD)
-
-![ERD del Blog](diagram.png)
-
-**Tablas principales:**
-- **user** — autores registrados
-- **post** — publicaciones de usuarios
-- **comment** — comentarios a publicaciones
-- **category** — categorías con relación M:N a post
-- **like** — likes únicos por usuario y post
-
----
-
-## ⚙️ Instalación
-
+## ▶️ Reproducir el diagrama
 ```bash
-# 1. Clonar repositorio
-git clone https://github.com/alejandrabarcena/modelo-de-datos-blog.git
-cd modelo-de-datos-blog
-
-# 2. Crear entorno virtual
 pipenv install
+pipenv run diagram   # genera diagram.png
 
-# 3. Activar entorno
-pipenv shell
+📄 Estructura
 
-# 4. Configurar variables de entorno
-cp src/.env.example .env
+src/models.py – modelos + serialize()
 
-# 5. Inicializar base de datos
-flask db upgrade
+schema.sql – DDL PostgreSQL (importable en ChartDB → SQL Script)
 
-# 6. Ejecutar el servidor
-flask run
+diagram.png – diagrama generado desde código
 
-📂 Estructura de carpetas
-modelo-de-datos-blog/
-│── migrations/         # Migraciones Alembic
-│── src/                # Código fuente
-│   ├── app.py           # App Flask
-│   ├── models.py        # Modelos SQLAlchemy
-│   ├── .env.example     # Variables de entorno
-│── diagram.png          # Diagrama ERD
-│── README.md
+🗺️ Diagrama
+
+🔗 Diagrama interactivo (ChartDB)
+
+Pega aquí tu link público de ChartDB
+
+
+## Siguiente mini-paso (2 minutos)
+1) Exporta desde ChartDB el **PNG/SVG** final y guárdalo como `diagram.png` en la raíz del repo (reemplaza el actual si quieres).  
+2) Pega el README y sube:
+```bash
+git add README.md diagram.png
+git commit -m "docs: README con diagrama y pasos de uso"
+git push origin main
 
