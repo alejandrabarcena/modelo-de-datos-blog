@@ -1,78 +1,132 @@
-﻿from datetime import datetime
-from flask_sqlalchemy import SQLAlchemy
+﻿import datetime
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, UniqueConstraint
+from sqlalchemy.orm import relationship, declarative_base
+from eralchemy2 import render_er
 
-db = SQLAlchemy()  # la instancia vive aquí; app.py la inicializa con init_app()
+Base = declarative_base()
 
-# Tabla intermedia muchos-a-muchos entre Post y Category
-post_categories = db.Table(
-    "post_categories",
-    db.Column("post_id", db.Integer, db.ForeignKey("post.id"), primary_key=True),
-    db.Column("category_id", db.Integer, db.ForeignKey("category.id"), primary_key=True),
-    db.UniqueConstraint("post_id", "category_id", name="uq_post_category"),
-)
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True)
+    email = Column(String(120), unique=True, nullable=False, index=True)
+    password_hash = Column(String(255), nullable=False)  # no exponer en serialize
+    first_name = Column(String(80))
+    last_name = Column(String(80))
+    is_active = Column(Boolean, nullable=False, default=True)
+    created_at = Column(DateTime, nullable=False, default=datetime.datetime.utcnow)
 
-class User(db.Model):
-    __tablename__ = "user"
+    favorite_planets = relationship("FavoritePlanet", back_populates="user", cascade="all, delete-orphan")
+    favorite_characters = relationship("FavoriteCharacter", back_populates="user", cascade="all, delete-orphan")
 
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False, index=True)
-    password = db.Column(db.String(255), nullable=False)
-    is_active = db.Column(db.Boolean, nullable=False, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    def serialize(self):
+        return {
+            "id": self.id,
+            "email": self.email,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "is_active": self.is_active,
+            "created_at": self.created_at.isoformat(),
+        }
 
-    posts = db.relationship("Post", back_populates="author", cascade="all, delete-orphan")
-    comments = db.relationship("Comment", back_populates="author", cascade="all, delete-orphan")
-    likes = db.relationship("Like", back_populates="user", cascade="all, delete-orphan")
+class Planet(Base):
+    __tablename__ = "planets"
+    id = Column(Integer, primary_key=True)
+    name = Column(String(120), unique=True, nullable=False, index=True)
+    climate = Column(String(120))
+    terrain = Column(String(120))
+    population = Column(String(120))
+    gravity = Column(String(80))
+    diameter = Column(String(80))
+    rotation_period = Column(String(80))
+    orbital_period = Column(String(80))
 
-class Post(db.Model):
-    __tablename__ = "post"
+    fans = relationship("FavoritePlanet", back_populates="planet", cascade="all, delete-orphan")
+    residents = relationship("Character", back_populates="homeworld")
 
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(160), nullable=False)
-    body = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "climate": self.climate,
+            "terrain": self.terrain,
+            "population": self.population,
+            "gravity": self.gravity,
+            "diameter": self.diameter,
+            "rotation_period": self.rotation_period,
+            "orbital_period": self.orbital_period,
+        }
 
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
-    author = db.relationship("User", back_populates="posts")
+class Character(Base):
+    __tablename__ = "characters"
+    id = Column(Integer, primary_key=True)
+    name = Column(String(120), unique=True, nullable=False, index=True)
+    gender = Column(String(40))
+    birth_year = Column(String(40))
+    height = Column(String(40))
+    mass = Column(String(40))
+    hair_color = Column(String(40))
+    skin_color = Column(String(40))
+    eye_color = Column(String(40))
 
-    comments = db.relationship("Comment", back_populates="post", cascade="all, delete-orphan")
-    likes = db.relationship("Like", back_populates="post", cascade="all, delete-orphan")
-    categories = db.relationship("Category", secondary=post_categories, back_populates="posts")
+    homeworld_id = Column(Integer, ForeignKey("planets.id"))
+    homeworld = relationship("Planet", back_populates="residents")
+    fans = relationship("FavoriteCharacter", back_populates="character", cascade="all, delete-orphan")
 
-class Comment(db.Model):
-    __tablename__ = "comment"
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "gender": self.gender,
+            "birth_year": self.birth_year,
+            "height": self.height,
+            "mass": self.mass,
+            "hair_color": self.hair_color,
+            "skin_color": self.skin_color,
+            "eye_color": self.eye_color,
+            "homeworld_id": self.homeworld_id,
+        }
 
-    id = db.Column(db.Integer, primary_key=True)
-    body = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+class FavoritePlanet(Base):
+    __tablename__ = "favorite_planets"
+    __table_args__ = (UniqueConstraint("user_id", "planet_id", name="uq_user_planet"),)
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    planet_id = Column(Integer, ForeignKey("planets.id"), nullable=False, index=True)
+    created_at = Column(DateTime, nullable=False, default=datetime.datetime.utcnow)
 
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
-    post_id = db.Column(db.Integer, db.ForeignKey("post.id"), nullable=False, index=True)
+    user = relationship("User", back_populates="favorite_planets")
+    planet = relationship("Planet", back_populates="fans")
 
-    author = db.relationship("User", back_populates="comments")
-    post = db.relationship("Post", back_populates="comments")
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "planet_id": self.planet_id,
+            "created_at": self.created_at.isoformat(),
+        }
 
-class Category(db.Model):
-    __tablename__ = "category"
+class FavoriteCharacter(Base):
+    __tablename__ = "favorite_characters"
+    __table_args__ = (UniqueConstraint("user_id", "character_id", name="uq_user_character"),)
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    character_id = Column(Integer, ForeignKey("characters.id"), nullable=False, index=True)
+    created_at = Column(DateTime, nullable=False, default=datetime.datetime.utcnow)
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), nullable=False, unique=True)
-    slug = db.Column(db.String(80), nullable=False, unique=True)
+    user = relationship("User", back_populates="favorite_characters")
+    character = relationship("Character", back_populates="fans")
 
-    posts = db.relationship("Post", secondary=post_categories, back_populates="categories")
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "character_id": self.character_id,
+            "created_at": self.created_at.isoformat(),
+        }
 
-class Like(db.Model):
-    __tablename__ = "like"
-
-    id = db.Column(db.Integer, primary_key=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
-    post_id = db.Column(db.Integer, db.ForeignKey("post.id"), nullable=False, index=True)
-
-    user = db.relationship("User", back_populates="likes")
-    post = db.relationship("Post", back_populates="likes")
-
-    __table_args__ = (
-        db.UniqueConstraint("user_id", "post_id", name="uq_user_post_like"),
-    )
+# Genera el diagrama ER a partir de los modelos
+try:
+    render_er(Base, "diagram.png")
+    print("diagram.png generado ✅")
+except Exception as e:
+    print("ERROR generando diagrama:", e)
