@@ -23,16 +23,12 @@ diagram.png – diagrama generado desde código
 
 🗺️ Diagrama
 
-🔗 Diagrama interactivo (ChartDB)
+# Mover el diagrama a la raíz si no está
+mv src/diagram.png ./diagram.png
 
-Pega aquí tu link público de ChartDB
-
-
-## Siguiente mini-paso (2 minutos)
-1) Exporta desde ChartDB el **PNG/SVG** final y guárdalo como `diagram.png` en la raíz del repo (reemplaza el actual si quieres).  
-2) Pega el README y sube:
-```bash
-git add README.md diagram.png
-git commit -m "docs: README con diagrama y pasos de uso"
+# Agregar y subir a GitHub
+git add diagram.png README.md
+git commit -m "docs: agregar diagrama al README"
 git push origin main
+
 
